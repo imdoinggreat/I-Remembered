@@ -1,9 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Key, ExternalLink, Save } from 'lucide-react';
+import { X, Key, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Button } from './Button';
-import { Input } from './Input';
-import { getStoredApiKey, setStoredApiKey } from '../services/geminiService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -11,32 +9,36 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const [apiKey, setApiKey] = useState('');
-  const [isSaved, setIsSaved] = useState(false);
+  const [hasKey, setHasKey] = useState<boolean>(false);
 
   useEffect(() => {
-    if (isOpen) {
-      const stored = getStoredApiKey();
-      // Only show the stored key if it is NOT the env variable (security)
-      if (stored && stored !== process.env.API_KEY) {
-        setApiKey(stored);
+    const checkKey = async () => {
+      const aistudio = (window as any).aistudio;
+      if (aistudio?.hasSelectedApiKey) {
+        try {
+          const selected = await aistudio.hasSelectedApiKey();
+          setHasKey(!!selected);
+        } catch (err) {
+          console.error("Error checking API key status:", err);
+        }
       }
+    };
+    if (isOpen) {
+      checkKey();
     }
   }, [isOpen]);
 
-  const handleSave = () => {
-    setStoredApiKey(apiKey.trim());
-    setIsSaved(true);
-    setTimeout(() => {
-      setIsSaved(false);
-      onClose();
-    }, 800);
-  };
-
-  const handleClear = () => {
-    setStoredApiKey('');
-    setApiKey('');
-    onClose();
+  const handleConnect = async () => {
+    const aistudio = (window as any).aistudio;
+    if (aistudio?.openSelectKey) {
+      try {
+        await aistudio.openSelectKey();
+        setHasKey(true);
+        onClose();
+      } catch (err) {
+        console.error("Error opening key selection dialog:", err);
+      }
+    }
   };
 
   if (!isOpen) return null;
@@ -47,7 +49,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
           <h3 className="font-bold text-gray-900 flex items-center">
             <Key size={18} className="mr-2 text-indigo-600" />
-            Settings & API Key
+            AI Settings
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
@@ -55,49 +57,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </div>
 
         <div className="p-6 space-y-4">
-          <p className="text-sm text-gray-600">
-            To use AI features (Pronunciation, Mnemonics, Images), you need a Google Gemini API Key.
+          <p className="text-sm text-gray-600 leading-relaxed">
+            To use AI-powered features such as Pronunciation, Memory Hooks, and Mnemonic Images, you must connect a valid Gemini API Key.
           </p>
 
-          <div className="bg-blue-50 p-3 rounded-md border border-blue-100 text-xs text-blue-700">
-             <strong>Note:</strong> Your key is stored locally in your browser. We do not see it.
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide">
-              Enter your Gemini API Key
-            </label>
-            <Input 
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="AIzaSy..."
-              type="password"
-              className="font-mono text-sm"
-            />
-            <div className="flex justify-between items-center pt-1">
-               <a 
-                href="https://aistudio.google.com/app/apikey" 
-                target="_blank" 
-                rel="noreferrer"
-                className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center"
-              >
-                Get a free key here <ExternalLink size={10} className="ml-1" />
-              </a>
-              {apiKey && (
-                 <button onClick={handleClear} className="text-xs text-red-500 hover:text-red-700 hover:underline">
-                    Clear Key
-                 </button>
-              )}
+          <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100 flex items-start gap-3">
+            <ShieldCheck className="text-indigo-600 shrink-0" size={20} />
+            <div className="text-xs text-indigo-700 leading-relaxed">
+              <strong>Secure Connection:</strong> Your API key is handled exclusively through Google AI Studio. We never see or store your private key on our servers.
             </div>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-2">
+             <div className="mb-4">
+                <a 
+                  href="https://ai.google.dev/gemini-api/docs/billing" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center"
+                >
+                  Learn about billing & paid projects <ExternalLink size={10} className="ml-1" />
+                </a>
+                <p className="text-[10px] text-gray-400 mt-1">Users must select an API key from a paid Google Cloud project.</p>
+             </div>
+            
             <Button 
-                onClick={handleSave} 
-                className={`w-full flex justify-center items-center ${isSaved ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                onClick={handleConnect} 
+                className="w-full flex justify-center items-center py-3"
             >
-              {isSaved ? 'Saved!' : 'Save API Key'}
-              {!isSaved && <Save size={16} className="ml-2" />}
+              {hasKey ? 'Change Connected API Key' : 'Connect Gemini API Key'}
+              <Key size={16} className="ml-2" />
             </Button>
           </div>
         </div>
