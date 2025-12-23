@@ -1,19 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, PlusCircle, Database, Menu, X, Layers, Settings } from 'lucide-react';
+import { BookOpen, PlusCircle, Database, Menu, X, Layers } from 'lucide-react';
 import { ViewState, VocabularyItem } from './types';
 import { loadVocabulary, saveVocabulary } from './services/storage';
 import { AddVocabulary } from './views/AddVocabulary';
 import { BatchImport } from './views/BatchImport';
 import { Review } from './views/Review';
 import { Repository } from './views/Repository';
-import { SettingsModal } from './components/SettingsModal';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>(ViewState.REVIEW);
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Load data on mount
   useEffect(() => {
@@ -74,16 +72,6 @@ const App: React.FC = () => {
           <NavItem targetView={ViewState.BATCH_IMPORT} icon={Layers} label="批量生成 (Batch)" />
           <NavItem targetView={ViewState.REPOSITORY} icon={Database} label="我的仓库 (Data)" />
         </nav>
-
-        <div className="mt-auto pt-4 border-t border-gray-100">
-           <button 
-             onClick={() => setIsSettingsOpen(true)}
-             className="flex items-center w-full px-4 py-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-           >
-             <Settings size={18} className="mr-3" />
-             <span className="text-sm font-medium">Settings / API Key</span>
-           </button>
-        </div>
       </aside>
 
       {/* Mobile Header */}
@@ -103,18 +91,6 @@ const App: React.FC = () => {
             <NavItem targetView={ViewState.BATCH_IMPORT} icon={Layers} label="批量生成" />
             <NavItem targetView={ViewState.REPOSITORY} icon={Database} label="我的仓库" />
           </nav>
-          <div className="pb-8 border-t border-gray-100 pt-4">
-             <button 
-               onClick={() => {
-                   setIsSettingsOpen(true);
-                   setIsMobileMenuOpen(false);
-               }}
-               className="flex items-center w-full px-4 py-3 text-gray-600 bg-gray-50 rounded-lg"
-             >
-               <Settings size={20} className="mr-3" />
-               <span className="font-medium">Settings / API Key</span>
-             </button>
-          </div>
         </div>
       )}
 
@@ -127,9 +103,6 @@ const App: React.FC = () => {
           {view === ViewState.REPOSITORY && <Repository items={vocabulary} />}
         </div>
       </main>
-      
-      {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
