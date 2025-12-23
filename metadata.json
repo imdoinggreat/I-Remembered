@@ -1,0 +1,5 @@
+{
+  "name": "我记住了 (I Remembered)",
+  "description": "A minimalist active-recall vocabulary app focusing on creating meaningful connections instead of rote memorization. Features an Obsidian-like UI, connection-based review system, and secure local data management.",
+  "requestFramePermissions": []
+}
