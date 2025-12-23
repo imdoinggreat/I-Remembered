@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Sparkles, Image as ImageIcon, Volume2 } from 'lucide-react';
+import { Plus, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Input, TextArea } from '../components/Input';
 import { VocabularyItem } from '../types';
@@ -19,7 +19,6 @@ export const AddVocabulary: React.FC<AddVocabularyProps> = ({ onSave }) => {
   const [isImgLoading, setIsImgLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
 
-  // Validation
   const isValid = hook.trim().length >= 3 && word.trim().length > 0;
 
   const handleSave = () => {
@@ -40,7 +39,6 @@ export const AddVocabulary: React.FC<AddVocabularyProps> = ({ onSave }) => {
     };
 
     onSave(newItem);
-    // Reset form
     setWord('');
     setDefinition('');
     setPhonetic('');
@@ -81,14 +79,14 @@ export const AddVocabulary: React.FC<AddVocabularyProps> = ({ onSave }) => {
             label="单词 / 短语" 
             placeholder="例如：Ephemeral"
             value={word}
-            onChange={(e) => setWord(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWord(e.target.value)}
             autoFocus
           />
           <Input 
             label="音标 (Phonetic)" 
             placeholder="例如：/əˈfemərəl/"
             value={phonetic}
-            onChange={(e) => setPhonetic(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhonetic(e.target.value)}
           />
         </div>
         
@@ -96,7 +94,7 @@ export const AddVocabulary: React.FC<AddVocabularyProps> = ({ onSave }) => {
             label="释义" 
             placeholder="例如：朝生暮死的，短暂的"
             value={definition}
-            onChange={(e) => setDefinition(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDefinition(e.target.value)}
         />
 
         <div className="flex-grow flex flex-col pt-4 min-h-[300px]">
@@ -129,7 +127,7 @@ export const AddVocabulary: React.FC<AddVocabularyProps> = ({ onSave }) => {
              <TextArea 
               placeholder="写下你的记忆钩子... (中英夹杂效果更好，至少3个字符)"
               value={hook}
-              onChange={(e) => setHook(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setHook(e.target.value)}
               className="text-lg leading-relaxed font-serif bg-gray-50 focus:bg-white h-32"
             />
             {generatedImage && (
