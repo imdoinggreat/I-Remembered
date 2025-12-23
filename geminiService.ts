@@ -128,7 +128,7 @@ export const generatePronunciation = async (word: string): Promise<string | null
     });
     
     const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    return data !== undefined ? data : null;
+    return data ?? null;
   } catch (error) {
     console.error("Gemini TTS Error:", error);
     return null;
